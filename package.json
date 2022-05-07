@@ -2,7 +2,7 @@
   "name": "minesweeper",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "private": true,
   "scripts": {
     "build": "tsc && npm run build:copy",
     "build:copy": "copyfiles -f src/html/* dist && copyfiles -f src/styles/* dist && copyfiles -f node_modules/normalize.css/normalize.css dist"
@@ -17,6 +17,7 @@
     "typescript": "^4.6.4"
   },
   "dependencies": {
-    "normalize.css": "^8.0.1"
+    "normalize.css": "^8.0.1",
+    "random-int": "^3.0.0"
   }
 }
