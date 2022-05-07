@@ -5,6 +5,7 @@ export class Board {
   private readonly gridSize = 20;
   private readonly numberOfBombs = 30;
   private canvasSizePx = 500;
+  private canvasContentOffsetPx = 10;
 
   private canvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D | null;
@@ -50,14 +51,23 @@ export class Board {
       return;
     }
 
-    for (let x = 0; x < this.gridSize; x++) {
-      this.context.moveTo(x, 0);
-      this.context.lineTo(x, this.canvasSizePx);
+    this.context.strokeStyle = '#163d8a';
+    this.context.lineWidth = 2;
+
+    const offset = this.canvasContentOffsetPx;
+
+    for (let x = 0; x <= this.gridSize; x++) {
+      this.context.beginPath();
+      this.context.moveTo(x * this.fieldSizePx + offset, 0 + offset);
+      this.context.lineTo(x * this.fieldSizePx + offset, this.canvasSizePx + offset);
+      this.context.stroke();
     }
 
-    for (let y = 0; y < this.gridSize; y++) {
-      this.context.moveTo(0, y);
-      this.context.lineTo(this.canvasSizePx, y);
+    for (let y = 0; y <= this.gridSize; y++) {
+      this.context.beginPath();
+      this.context.moveTo(0 + offset, y * this.fieldSizePx + offset);
+      this.context.lineTo(this.canvasSizePx + offset, y * this.fieldSizePx + offset);
+      this.context.stroke();
     }
   }
 }
