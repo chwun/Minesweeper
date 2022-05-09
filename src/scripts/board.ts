@@ -20,6 +20,8 @@ export class Board {
   }
 
   init() {
+    this.canvas.addEventListener('click', this.onCanvasClicked);
+
     this.initGridData();
     this.placeBombs();
     this.drawGrid();
@@ -101,7 +103,7 @@ export class Board {
   }
 
   private drawGridLines() {
-    this.context.strokeStyle = '#163d8a';
+    this.context.strokeStyle = 'black';
     this.context.lineWidth = 2;
 
     const offset = this.canvasContentOffsetPx;
@@ -132,44 +134,59 @@ export class Board {
 
         const fieldCenterX = x * fieldSize + offset + fieldCenterOffset;
         const fieldCenterY = y * fieldSize + offset + fieldCenterOffset;
+        const fieldTopLeftX = x * fieldSize + offset + 1;
+        const fieldTopLeftY = y * fieldSize + offset + 1;
 
-        if (field.hasBomb) {
-          this.context.beginPath();
-          this.context.fillStyle = 'red';
-          this.context.arc(fieldCenterX, fieldCenterY, fieldSize * 0.4, 0, 2 * Math.PI);
-          this.context.fill();
+        if (!field.isRevealed) {
+          this.context.fillStyle = 'gray';
+          this.context.fillRect(fieldTopLeftX, fieldTopLeftY, fieldSize - 2, fieldSize - 2);
         } else {
-          if (field.value > 0) {
-            let textColor = 'black';
-            switch (field.value) {
-              case 1:
-                textColor = 'green';
-                break;
+          if (field.hasBomb) {
+            this.context.beginPath();
+            this.context.fillStyle = 'red';
+            this.context.arc(fieldCenterX, fieldCenterY, fieldSize * 0.4, 0, 2 * Math.PI);
+            this.context.fill();
+          } else {
+            if (field.value > 0) {
+              let textColor = 'black';
+              switch (field.value) {
+                case 1:
+                  textColor = 'green';
+                  break;
 
-              case 2:
-                textColor = 'blue';
-                break;
+                case 2:
+                  textColor = 'blue';
+                  break;
 
-              case 3:
-                textColor = 'orange';
-                break;
+                case 3:
+                  textColor = 'orange';
+                  break;
 
-              default:
-                textColor = 'red';
-                break;
+                default:
+                  textColor = 'red';
+                  break;
+              }
+
+              this.context.font = 'bold 18px Arial';
+              this.context.fillStyle = textColor;
+              this.context.textAlign = 'center';
+              this.context.fillText(
+                String(field.value),
+                fieldCenterX,
+                fieldCenterY + fieldSize * 0.25
+              );
             }
-
-            this.context.font = 'bold 18px Arial';
-            this.context.fillStyle = textColor;
-            this.context.textAlign = 'center';
-            this.context.fillText(
-              String(field.value),
-              fieldCenterX,
-              fieldCenterY + fieldSize * 0.25
-            );
           }
         }
       }
     }
+  }
+
+  private onCanvasClicked(e: MouseEvent): void {
+    if (!e) {
+      return;
+    }
+
+    e.preventDefault();
   }
 }
