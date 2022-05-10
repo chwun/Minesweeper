@@ -21,10 +21,11 @@ export class Board {
 
   init() {
     this.canvas.addEventListener('click', (e: MouseEvent) => this.onCanvasClicked(e));
+    this.canvas.addEventListener('contextmenu', (e: MouseEvent) => this.onContextMenu(e));
 
     this.initGridData();
     this.placeBombs();
-    this.drawGrid();
+    this.redrawGrid();
   }
 
   private placeBombs() {
@@ -93,11 +94,12 @@ export class Board {
     }
   }
 
-  private drawGrid() {
+  private redrawGrid() {
     if (!this.context) {
       return;
     }
 
+    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.drawGridLines();
     this.drawGridContent();
   }
@@ -140,6 +142,13 @@ export class Board {
         if (!field.isRevealed) {
           this.context.fillStyle = 'gray';
           this.context.fillRect(fieldTopLeftX, fieldTopLeftY, fieldSize - 2, fieldSize - 2);
+
+          if (field.isFlagged) {
+            this.context.beginPath();
+            this.context.fillStyle = 'black';
+            this.context.arc(fieldCenterX, fieldCenterY, fieldSize * 0.3, 0, 2 * Math.PI);
+            this.context.stroke();
+          }
         } else {
           if (field.hasBomb) {
             this.context.beginPath();
@@ -182,16 +191,43 @@ export class Board {
     }
   }
 
-  private onCanvasClicked(e: MouseEvent): void {
-    e.preventDefault();
+  private revealField(xGrid: number, yGrid: number) {
+    if (this.fields[xGrid][yGrid].isFlagged) {
+      return;
+    }
 
+    this.fields[xGrid][yGrid].isRevealed = true;
+
+    this.redrawGrid();
+  }
+
+  private flagField(xGrid: number, yGrid: number) {
+    if (this.fields[xGrid][yGrid].isRevealed) {
+      return;
+    }
+
+    this.fields[xGrid][yGrid].isFlagged = true;
+    this.redrawGrid();
+  }
+
+  private onCanvasClicked(e: MouseEvent): void {
+    this.handleMouseClick(e);
+  }
+
+  private onContextMenu(e: MouseEvent): void {
+    this.handleMouseClick(e);
+  }
+
+  private handleMouseClick(e: MouseEvent) {
     if (!e) {
       return;
     }
 
+    e.preventDefault();
+
     const rect = this.canvas.getBoundingClientRect();
-    const x = Math.floor(e.clientX - rect.left - this.canvasContentOffsetPx);
-    const y = Math.floor(e.clientY - rect.top - this.canvasContentOffsetPx);
+    const x = e.clientX - rect.left - this.canvasContentOffsetPx;
+    const y = e.clientY - rect.top - this.canvasContentOffsetPx;
 
     if (x < 0 || y < 0) {
       return;
@@ -200,6 +236,22 @@ export class Board {
     const xGrid = Math.floor(x / this.fieldSizePx);
     const yGrid = Math.floor(y / this.fieldSizePx);
 
-    console.log('xGrid: ' + xGrid + ' yGrid: ' + yGrid);
+    if (xGrid > this.gridSize || yGrid > this.gridSize) {
+      return;
+    }
+
+    if (e.button == 0) {
+      console.log('left mouse button clicked');
+    } else if (e.button == 2) {
+      console.log('right mouse button clicked');
+    }
+  }
+
+  private handleFieldLeftClick(xGrid: number, yGrid: number) {
+    this.revealField(xGrid, yGrid);
+  }
+
+  private handleFieldRightClick(xGrid: number, yGrid: number) {
+    this.flagField(xGrid, yGrid);
   }
 }
