@@ -20,7 +20,7 @@ export class Board {
   }
 
   init() {
-    this.canvas.addEventListener('click', this.onCanvasClicked);
+    this.canvas.addEventListener('click', (e: MouseEvent) => this.onCanvasClicked(e));
 
     this.initGridData();
     this.placeBombs();
@@ -183,10 +183,23 @@ export class Board {
   }
 
   private onCanvasClicked(e: MouseEvent): void {
+    e.preventDefault();
+
     if (!e) {
       return;
     }
 
-    e.preventDefault();
+    const rect = this.canvas.getBoundingClientRect();
+    const x = Math.floor(e.clientX - rect.left - this.canvasContentOffsetPx);
+    const y = Math.floor(e.clientY - rect.top - this.canvasContentOffsetPx);
+
+    if (x < 0 || y < 0) {
+      return;
+    }
+
+    const xGrid = Math.floor(x / this.fieldSizePx);
+    const yGrid = Math.floor(y / this.fieldSizePx);
+
+    console.log('xGrid: ' + xGrid + ' yGrid: ' + yGrid);
   }
 }
