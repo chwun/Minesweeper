@@ -198,6 +198,12 @@ export class Board {
 
     this.fields[xGrid][yGrid].isRevealed = true;
 
+    if (this.fields[xGrid][yGrid].hasBomb) {
+      // explode -> lose game
+    } else {
+      // reveal adjacent fields
+    }
+
     this.redrawGrid();
   }
 
