@@ -203,8 +203,6 @@ export class Board {
     } else {
       // reveal adjacent fields
     }
-
-    this.redrawGrid();
   }
 
   private flagField(xGrid: number, yGrid: number) {
@@ -247,17 +245,19 @@ export class Board {
     }
 
     if (e.button == 0) {
-      console.log('left mouse button clicked');
+      this.handleFieldLeftClick(xGrid, yGrid);
     } else if (e.button == 2) {
-      console.log('right mouse button clicked');
+      this.handleFieldRightClick(xGrid, yGrid);
     }
   }
 
   private handleFieldLeftClick(xGrid: number, yGrid: number) {
     this.revealField(xGrid, yGrid);
+    this.redrawGrid();
   }
 
   private handleFieldRightClick(xGrid: number, yGrid: number) {
     this.flagField(xGrid, yGrid);
+    this.redrawGrid();
   }
 }
