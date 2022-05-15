@@ -3,7 +3,7 @@ import { Field } from './field';
 
 export class Board {
   private readonly gridSize = 20;
-  private readonly numberOfBombs = 35;
+  private readonly numberOfBombs = 45;
   private canvasSizePx = 500;
   private canvasContentOffsetPx = 10;
 
@@ -192,16 +192,41 @@ export class Board {
   }
 
   private revealField(xGrid: number, yGrid: number) {
-    if (this.fields[xGrid][yGrid].isFlagged) {
+    const field = this.fields[xGrid][yGrid];
+
+    if (field.isFlagged || field.isRevealed) {
       return;
     }
 
-    this.fields[xGrid][yGrid].isRevealed = true;
+    field.isRevealed = true;
 
-    if (this.fields[xGrid][yGrid].hasBomb) {
+    if (field.value > 0) {
+      return;
+    } else if (field.hasBomb) {
       // explode -> lose game
+      console.log('Boooooooooom!');
     } else {
       // reveal adjacent fields
+
+      // top
+      if (yGrid > 0) {
+        this.revealField(xGrid, yGrid - 1);
+      }
+
+      // right
+      if (xGrid < this.gridSize - 1) {
+        this.revealField(xGrid + 1, yGrid);
+      }
+
+      // bottom
+      if (yGrid < this.gridSize - 1) {
+        this.revealField(xGrid, yGrid + 1);
+      }
+
+      // left
+      if (xGrid > 0) {
+        this.revealField(xGrid - 1, yGrid);
+      }
     }
   }
 
